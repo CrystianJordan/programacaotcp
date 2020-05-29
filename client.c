@@ -2,12 +2,13 @@
 #include <string.h> /* strlen */
 #include <sys/socket.h>
 #include <arpa/inet.h> /* inet_addr */
+#include <unistd.h> /* close */
 
 int main(int argc, char *argv[])
 {
     int socket_desc;
     struct sockaddr_in server;
-    char *message;
+    char *message, server_reply[2000];
 
     /* AF_INET - IPv4, SOCK_STREAM - tcp, 0 - IP */
     socket_desc = socket(AF_INET, SOCK_STREAM, 0); 
@@ -35,7 +36,7 @@ int main(int argc, char *argv[])
     };
     */
     /* informa os dados do servidor para onde vamos nos conectar */
-    server.sin_addr.s_addr = inet_addr("192.168.1.1072"); /* converte IP para long */
+    server.sin_addr.s_addr = inet_addr("192.168.1.107"); /* converte IP para long */
     server.sin_family = AF_INET; /* ip v4 */
     server.sin_port = htons(80);
 
@@ -56,6 +57,17 @@ int main(int argc, char *argv[])
         return 1;
     }
     printf("Dados enviados.\n");
+
+    /* recebe dados do servidor */
+    if (recv(socket_desc, server_reply, 2000, 0) < 0)
+    {
+        printf("Falha no recv\n");
+        return 1;
+    }
+    printf("Resposta recebida.\n");
+    printf("%s\n", server_reply);
+
+    close(socket_desc);
 
     return 0;
 }
